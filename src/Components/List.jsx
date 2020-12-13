@@ -1,50 +1,45 @@
-import React, { Fragment } from 'react'
+import React, { useState } from 'react'
 import { useQuery } from '@apollo/client'
 import GET_CHARACTERS from '../Queries/Characters'
 
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Divider from '@material-ui/core/Divider';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from '@material-ui/core/Avatar';
-import Chip from '@material-ui/core/Chip';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import List from '@material-ui/core/List'
+import CircularProgress from '@material-ui/core/CircularProgress'
+import Pagination from '@material-ui/lab/Pagination'
+import Box from '@material-ui/core/Box'
+
+import Character from './Character'
 
 function ListView() {
+  const [currentPage, setPage] = useState(1)
+
   const { loading, error, data } = useQuery(GET_CHARACTERS, {
-    variables: { page: 1 },
-  });
+    variables: { page: currentPage },
+  })
 
-  function renderItem({
-    name,
-    image,
-    status,
-    species,
-    gender,
-  }) {
-    return (
-      <Fragment>
-        <ListItem alignItems="flex-start">
-          <ListItemAvatar>
-            <Avatar alt={name} src={image} />
-          </ListItemAvatar>
-          <ListItemText
-            primary={name}
-          />
-          <Chip label={status} />
-          <Chip label={species} />
-          <Chip label={gender} />
-        </ListItem>
-        <Divider />
-      </Fragment>
-    )
-  }
+  const {
+    characters: {
+      info,
+      results,
+    },
+  } = data || { characters: { info: {}, results: []} }
 
-  const { characters: { results } } = data || { characters: { results: []} }
+  const { next, pages } = info
 
   if (loading) {
-    return (<CircularProgress />)
+    return (
+      <Box
+        top={0}
+        left={0}
+        bottom={0}
+        right={0}
+        position="absolute"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <CircularProgress />
+      </Box>
+      )
   }
 
   if (error) {
@@ -56,10 +51,17 @@ function ListView() {
   return (
     <div className="List">
       <List>
-        {results.map((character) => renderItem(character))}
+        {results.map((character) => <Character {...character} />)}
       </List>
+      <Pagination
+        count={pages}
+        page={next - 1}
+        onChange={(event, value) => {
+          setPage(value)
+        }}
+      />
     </div>
-  );
+  )
 }
 
-export default ListView;
+export default ListView
