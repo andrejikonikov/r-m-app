@@ -1,12 +1,10 @@
 import React from 'react'
 import Container from '@material-ui/core/Container'
 
-import List from './List'
-
-function Page() {
+function Page({ children }) {
   return (
     <Container fixed>
-      <List />
+      {children}
     </Container>
   )
 }

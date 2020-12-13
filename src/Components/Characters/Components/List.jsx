@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 import { useQuery } from '@apollo/client'
-import GET_CHARACTERS from '../Queries/Characters'
-
 import List from '@material-ui/core/List'
-import CircularProgress from '@material-ui/core/CircularProgress'
 import Pagination from '@material-ui/lab/Pagination'
-import Box from '@material-ui/core/Box'
 
-import Character from './Character'
+import GET_CHARACTERS from '../../Queries/Characters'
+import LoadingView from '../../Shared/LoadingView'
+import ErrorMessage from '../../Shared/ErrorMessage'
+import Character from './CharacterItem'
 
 function ListView() {
   const [currentPage, setPage] = useState(1)
@@ -26,32 +25,17 @@ function ListView() {
   const { next, pages } = info
 
   if (loading) {
-    return (
-      <Box
-        top={0}
-        left={0}
-        bottom={0}
-        right={0}
-        position="absolute"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <CircularProgress />
-      </Box>
-      )
+    return ( <LoadingView /> )
   }
 
   if (error) {
-    return (
-      <p severity="error">Something went wrong, try later.</p>
-    )
+    return ( <ErrorMessage /> )
   }
 
   return (
     <div className="List">
       <List>
-        {results.map((character) => <Character {...character} />)}
+        {results.map(({ id, ...rest }) => <Character key={id} id={id} {...rest} />)}
       </List>
       <Pagination
         count={pages}
